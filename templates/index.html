@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Control de LEDs</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+
+  <div class="bg-white shadow-md rounded-xl p-8 w-full max-w-md">
+    <h2 class="text-2xl font-bold mb-6 text-center">Panel de Control de LEDs</h2>
+
+    <form id="controlForm" class="space-y-6">
+      <!-- LED 1 -->
+      <div>
+        <p class="font-semibold mb-1">LED 1</p>
+        <div class="flex gap-2">
+          <button type="button" data-comando="encender_led1" class="flex-1 bg-green-500 hover:bg-green-600 text-white py-2 rounded">Encender</button>
+          <button type="button" data-comando="apagar_led1" class="flex-1 bg-red-500 hover:bg-red-600 text-white py-2 rounded">Apagar</button>
+        </div>
+      </div>
+
+      <!-- LED 2 -->
+      <div>
+        <p class="font-semibold mb-1">LED 2</p>
+        <div class="flex gap-2">
+          <button type="button" data-comando="encender_led2" class="flex-1 bg-green-500 hover:bg-green-600 text-white py-2 rounded">Encender</button>
+          <button type="button" data-comando="apagar_led2" class="flex-1 bg-red-500 hover:bg-red-600 text-white py-2 rounded">Apagar</button>
+        </div>
+      </div>
+
+      <!-- LED 3 -->
+      <div>
+        <p class="font-semibold mb-1">LED 3</p>
+        <div class="flex gap-2">
+          <button type="button" data-comando="encender_led3" class="flex-1 bg-green-500 hover:bg-green-600 text-white py-2 rounded">Encender</button>
+          <button type="button" data-comando="apagar_led3" class="flex-1 bg-red-500 hover:bg-red-600 text-white py-2 rounded">Apagar</button>
+        </div>
+      </div>
+    </form>
+
+    <!-- Reconocimiento de Voz -->
+    <div class="mt-8 text-center">
+      <button id="vozBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded">
+        🎙️ Activar Reconocimiento de Voz
+      </button>
+      <p id="vozTexto" class="mt-4 text-gray-600 text-sm italic"></p>
+    </div>
+
+    <!-- Mensaje de estado -->
+    <p id="mensaje" class="mt-6 text-center font-semibold"></p>
+  </div>
+
+  <script>
+    // Botones manuales
+    const buttons = document.querySelectorAll('button[data-comando]');
+    const mensaje = document.getElementById('mensaje');
+
+    buttons.forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const comando = btn.getAttribute('data-comando');
+        await enviarComando(comando);
+      });
+    });
+
+    async function enviarComando(comando) {
+      try {
+        const response = await fetch('/accion', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams({ comando })
+        });
+
+        if (response.ok) {
+          mensaje.textContent = '✅ Comando enviado: ' + comando;
+          mensaje.className = 'mt-6 text-center text-green-600 font-semibold';
+        } else {
+          mensaje.textContent = '❌ Error al enviar comando.';
+          mensaje.className = 'mt-6 text-center text-red-600 font-semibold';
+        }
+      } catch (error) {
+        mensaje.textContent = '❌ Error de conexión con el servidor.';
+        mensaje.className = 'mt-6 text-center text-red-600 font-semibold';
+      }
+    }
+
+    // Reconocimiento de voz
+    const vozBtn = document.getElementById('vozBtn');
+    const vozTexto = document.getElementById('vozTexto');
+    let recognition;
+
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognition = new SpeechRecognition();
+      recognition.lang = 'es-ES';
+      recognition.continuous = false;
+
+      recognition.onresult = async function (event) {
+        const texto = event.results[0][0].transcript.toLowerCase();
+        vozTexto.textContent = 'Comando detectado: "' + texto + '"';
+
+        // Mapeo de voz a comandos
+        if (texto.includes('encender luz uno')) await enviarComando('encender_led1');
+        else if (texto.includes('apagar luz uno')) await enviarComando('apagar_led1');
+        else if (texto.includes('encender luz dos')) await enviarComando('encender_led2');
+        else if (texto.includes('apagar luz dos')) await enviarComando('apagar_led2');
+        else if (texto.includes('encender luz tres')) await enviarComando('encender_led3');
+        else if (texto.includes('apagar luz tres')) await enviarComando('apagar_led3');
+        else {
+          mensaje.textContent = '❌ Comando de voz no reconocido.';
+          mensaje.className = 'mt-6 text-center text-red-600 font-semibold';
+        }
+      };
+
+      recognition.onerror = function (event) {
+        vozTexto.textContent = 'Error: ' + event.error;
+      };
+
+      vozBtn.addEventListener('click', () => {
+        recognition.start();
+        vozTexto.textContent = '🎙️ Escuchando...';
+      });
+
+    } else {
+      vozTexto.textContent = '⚠️ Tu navegador no soporta reconocimiento de voz.';
+      vozBtn.disabled = true;
+      vozBtn.classList.add('bg-gray-400', 'cursor-not-allowed');
+    }
+  </script>
+
+</body>
+</html>
