@@ -1,133 +1,865 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Control de LEDs</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Control de LEDs - Panel de Control</title>
+    <meta
+      name="description"
+      content="Panel de control para gestionar LEDs por habitaciones con reconocimiento de voz"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: "#3b82f6",
+              success: "#10b981",
+              danger: "#ef4444",
+              warning: "#f59e0b",
+            },
+          },
+        },
+      };
+    </script>
+  </head>
+  <body
+    class="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen py-8 px-4"
+  >
+    <div class="max-w-6xl mx-auto">
+      <div class="flex gap-8 justify-center items-center">
+        <!-- Main Panel -->
+        <div class="flex-1 max-w-lg">
+          <!-- Header -->
+          <header class="text-center mb-8">
+            <div
+              class="inline-flex items-center justify-center w-16 h-16 bg-primary rounded-full mb-4"
+            >
+              <svg
+                class="w-8 h-8 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"
+                ></path>
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M8 21l4-4 4 4M3 7l9-6 9 6"
+                ></path>
+              </svg>
+            </div>
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">
+              Control Inteligente del Hogar
+            </h1>
+            <p class="text-gray-600">
+              Controla diferentes habitaciones de tu hogar con comandos de voz o botones manuales.
+            </p>
+          </header>
 
-  <div class="bg-white shadow-md rounded-xl p-8 w-full max-w-md">
-    <h2 class="text-2xl font-bold mb-6 text-center">Panel de Control de LEDs</h2>
+          <!-- Guide Toggle Button -->
+          <div class="mb-8 text-center">
+            <button 
+              id="toggleGuide" 
+              class="inline-flex items-center justify-center bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              aria-label="Mostrar/ocultar guía de comandos"
+            >
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <span id="guideButtonText">Mostrar Guía de Comandos</span>
+              <svg id="chevronRight" class="w-4 h-4 ml-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+              </svg>
+            </button>
+          </div>
 
-    <form id="controlForm" class="space-y-6">
-      <!-- LED 1 -->
-      <div>
-        <p class="font-semibold mb-1">LED 1</p>
-        <div class="flex gap-2">
-          <button type="button" data-comando="encender_led1" class="flex-1 bg-green-500 hover:bg-green-600 text-white py-2 rounded">Encender</button>
-          <button type="button" data-comando="apagar_led1" class="flex-1 bg-red-500 hover:bg-red-600 text-white py-2 rounded">Apagar</button>
+          <!-- Main Control Panel -->
+          <main class="bg-white shadow-xl rounded-2xl overflow-hidden">
+            <!-- LED Controls Section -->
+            <section class="p-6 border-b border-gray-100">
+              <h2
+                class="text-xl font-semibold text-gray-800 mb-6 flex items-center"
+              >
+                <span class="w-2 h-2 bg-primary rounded-full mr-3"></span>
+                Control de Habitaciones
+              </h2>
+
+              <form
+                id="controlForm"
+                class="space-y-6"
+                role="group"
+                aria-labelledby="led-controls"
+              >
+                <!-- Cuarto -->
+                <fieldset class="border border-gray-200 rounded-lg p-4 bg-gray-50">
+                  <legend class="font-semibold text-gray-700 px-2 flex items-center">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"></path>
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 21l4-4 4 4M3 7l9-6 9 6"></path>
+                    </svg>
+                    Cuarto
+                  </legend>
+                  <div class="flex gap-3 mt-3">
+                    <button
+                      type="button"
+                      data-comando="encender_cuarto"
+                      class="flex-1 bg-success hover:bg-green-600 active:bg-green-700 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+                      aria-label="Encender luz del cuarto"
+                    >
+                      <span class="flex items-center justify-center">
+                        <svg
+                          class="w-4 h-4 mr-2"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M5 13l4 4L19 7"
+                          ></path>
+                        </svg>
+                        Encender
+                      </span>
+                    </button>
+                    <button
+                      type="button"
+                      data-comando="apagar_cuarto"
+                      class="flex-1 bg-danger hover:bg-red-600 active:bg-red-700 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                      aria-label="Apagar luz del cuarto"
+                    >
+                      <span class="flex items-center justify-center">
+                        <svg
+                          class="w-4 h-4 mr-2"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12"
+                          ></path>
+                        </svg>
+                        Apagar
+                      </span>
+                    </button>
+                  </div>
+                </fieldset>
+
+                <!-- Sala -->
+                <fieldset class="border border-gray-200 rounded-lg p-4 bg-gray-50">
+                  <legend class="font-semibold text-gray-700 px-2 flex items-center">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2"></path>
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 4h14l-1 14H6L5 4z"></path>
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 11v6"></path>
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 11v6"></path>
+                    </svg>
+                    Sala
+                  </legend>
+                  <div class="flex gap-3 mt-3">
+                    <button
+                      type="button"
+                      data-comando="encender_sala"
+                      class="flex-1 bg-success hover:bg-green-600 active:bg-green-700 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+                      aria-label="Encender luz de la sala"
+                    >
+                      <span class="flex items-center justify-center">
+                        <svg
+                          class="w-4 h-4 mr-2"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M5 13l4 4L19 7"
+                          ></path>
+                        </svg>
+                        Encender
+                      </span>
+                    </button>
+                    <button
+                      type="button"
+                      data-comando="apagar_sala"
+                      class="flex-1 bg-danger hover:bg-red-600 active:bg-red-700 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                      aria-label="Apagar luz de la sala"
+                    >
+                      <span class="flex items-center justify-center">
+                        <svg
+                          class="w-4 h-4 mr-2"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12"
+                          ></path>
+                        </svg>
+                        Apagar
+                      </span>
+                    </button>
+                  </div>
+                </fieldset>
+
+                <!-- Cocina -->
+                <fieldset class="border border-gray-200 rounded-lg p-4 bg-gray-50">
+                  <legend class="font-semibold text-gray-700 px-2 flex items-center">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                    </svg>
+                    Cocina
+                  </legend>
+                  <div class="flex gap-3 mt-3">
+                    <button
+                      type="button"
+                      data-comando="encender_cocina"
+                      class="flex-1 bg-success hover:bg-green-600 active:bg-green-700 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+                      aria-label="Encender luz de la cocina"
+                    >
+                      <span class="flex items-center justify-center">
+                        <svg
+                          class="w-4 h-4 mr-2"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M5 13l4 4L19 7"
+                          ></path>
+                        </svg>
+                        Encender
+                      </span>
+                    </button>
+                    <button
+                      type="button"
+                      data-comando="apagar_cocina"
+                      class="flex-1 bg-danger hover:bg-red-600 active:bg-red-700 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                      aria-label="Apagar luz de la cocina"
+                    >
+                      <span class="flex items-center justify-center">
+                        <svg
+                          class="w-4 h-4 mr-2"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12"
+                          ></path>
+                        </svg>
+                        Apagar
+                      </span>
+                    </button>
+                  </div>
+                </fieldset>
+              </form>
+            </section>
+
+            <!-- Intensity Control Section -->
+            <section class="p-6 border-b border-gray-100">
+              <h2
+                class="text-xl font-semibold text-gray-800 mb-6 flex items-center"
+              >
+                <span class="w-2 h-2 bg-warning rounded-full mr-3"></span>
+                Control de Intensidad
+              </h2>
+
+              <form id="intensidadForm" class="space-y-4">
+                <fieldset class="border border-gray-200 rounded-lg p-4 bg-gray-50">
+                  <legend class="font-semibold text-gray-700 px-2 flex items-center">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"></path>
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 21l4-4 4 4M3 7l9-6 9 6"></path>
+                    </svg>
+                    Intensidad del Cuarto
+                  </legend>
+                  <div class="mt-4">
+                    <div class="flex items-center justify-between mb-2">
+                      <label
+                        for="intensidad_cuarto"
+                        class="text-sm font-medium text-gray-600"
+                      >
+                        Nivel de intensidad
+                      </label>
+                      <output
+                        for="intensidad_cuarto"
+                        id="valor_cuarto"
+                        class="text-sm font-bold text-primary bg-blue-50 px-2 py-1 rounded"
+                      >
+                        Máximo
+                      </output>
+                    </div>
+                    <input
+                      type="range"
+                      min="1"
+                      max="5"
+                      step="1"
+                      id="intensidad_cuarto"
+                      name="intensidad_cuarto"
+                      value="5"
+                      class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+                      aria-label="Control de intensidad para luz del cuarto"
+                      oninput="enviarIntensidad('intensidad_cuarto')"
+                    />
+                    <div class="flex justify-between text-xs text-gray-500 mt-1">
+                      <span>Mínimo</span>
+                      <span>Bajo</span>
+                      <span>Medio</span>
+                      <span>Alto</span>
+                      <span>Máximo</span>
+                    </div>
+                    <div class="grid grid-cols-5 gap-1 mt-2">
+                      <div class="h-1 bg-gray-300 rounded"></div>
+                      <div class="h-1 bg-gray-400 rounded"></div>
+                      <div class="h-1 bg-gray-500 rounded"></div>
+                      <div class="h-1 bg-gray-600 rounded"></div>
+                      <div class="h-1 bg-gray-700 rounded"></div>
+                    </div>
+                  </div>
+                </fieldset>
+              </form>
+            </section>
+
+            <!-- Voice Recognition Section -->
+            <section class="p-6">
+              <h2
+                class="text-xl font-semibold text-gray-800 mb-6 flex items-center"
+              >
+                <span class="w-2 h-2 bg-primary rounded-full mr-3"></span>
+                Control por Voz
+              </h2>
+
+              <div class="text-center space-y-4">
+                <button
+                  id="vozBtn"
+                  class="inline-flex items-center justify-center bg-primary hover:bg-blue-700 active:bg-blue-800 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                  aria-label="Activar reconocimiento de voz"
+                >
+                  <svg
+                    class="w-5 h-5 mr-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"
+                    ></path>
+                  </svg>
+                  Activar Reconocimiento de Voz
+                </button>
+
+                <div
+                  id="vozTexto"
+                  class="min-h-[2rem] p-3 bg-gray-50 rounded-lg border border-gray-200"
+                  role="status"
+                  aria-live="polite"
+                >
+                  <span class="text-gray-500 text-sm italic"
+                    >Presiona el botón para comenzar a hablar...</span
+                  >
+                </div>
+              </div>
+            </section>
+
+            <!-- Status Message -->
+            <footer class="p-6 bg-gray-50">
+              <div
+                id="mensaje"
+                class="text-center font-semibold p-3 rounded-lg bg-white border border-gray-200 min-h-[3rem] flex items-center justify-center"
+                role="status"
+                aria-live="polite"
+              >
+                <span class="text-gray-500"
+                  >Sistema listo para recibir comandos</span
+                >
+              </div>
+            </footer>
+          </main>
         </div>
-      </div>
 
-      <!-- LED 2 -->
-      <div>
-        <p class="font-semibold mb-1">LED 2</p>
-        <div class="flex gap-2">
-          <button type="button" data-comando="encender_led2" class="flex-1 bg-green-500 hover:bg-green-600 text-white py-2 rounded">Encender</button>
-          <button type="button" data-comando="apagar_led2" class="flex-1 bg-red-500 hover:bg-red-600 text-white py-2 rounded">Apagar</button>
-        </div>
-      </div>
+        <!-- Voice Commands Guide Sidebar -->
+        <aside 
+          id="guidePanel" 
+          class="w-96 bg-blue-50 border border-blue-200 rounded-2xl p-6 transition-all duration-300 ease-in-out transform translate-x-full opacity-0 fixed right-4 top-8 bottom-8 overflow-y-auto z-10 shadow-2xl"
+          style="display: none;"
+        >
+          <div class="flex items-center mb-6">
+            <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center mr-3">
+              <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <h2 class="text-xl font-semibold text-blue-800 flex-1">Guía de Comandos de Voz</h2>
+            <button 
+              id="closeGuide" 
+              class="text-blue-600 hover:text-blue-800 focus:outline-none"
+              aria-label="Cerrar guía de comandos"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+          </div>
+          
+          <div class="space-y-6">
+            <!-- Important Note -->
+            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+              <div class="flex items-start">
+                <svg class="w-5 h-5 text-yellow-600 mt-0.5 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                </svg>
+                <div>
+                  <h3 class="font-semibold text-yellow-800 mb-1">¡Importante!</h3>
+                  <p class="text-sm text-yellow-700">
+                    Siempre debes decir <strong>"Asistente"</strong> antes de cada comando para que el sistema te reconozca.
+                  </p>
+                </div>
+              </div>
+            </div>
 
-      <!-- LED 3 -->
-      <div>
-        <p class="font-semibold mb-1">LED 3</p>
-        <div class="flex gap-2">
-          <button type="button" data-comando="encender_led3" class="flex-1 bg-green-500 hover:bg-green-600 text-white py-2 rounded">Encender</button>
-          <button type="button" data-comando="apagar_led3" class="flex-1 bg-red-500 hover:bg-red-600 text-white py-2 rounded">Apagar</button>
-        </div>
-      </div>
-    </form>
+            <!-- On/Off Commands -->
+            <div class="bg-white rounded-lg p-4 border border-gray-200">
+              <h3 class="font-semibold text-gray-800 mb-3 flex items-center">
+                <svg class="w-4 h-4 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                </svg>
+                Encender y Apagar Luces
+              </h3>
+              <div class="grid gap-2 text-sm">
+                <div class="flex items-center p-2 bg-green-50 rounded">
+                  <span class="font-mono text-green-700">"Asistente, encender luz del cuarto"</span>
+                </div>
+                <div class="flex items-center p-2 bg-red-50 rounded">
+                  <span class="font-mono text-red-700">"Asistente, apagar luz del cuarto"</span>
+                </div>
+                <div class="flex items-center p-2 bg-green-50 rounded">
+                  <span class="font-mono text-green-700">"Asistente, encender luz de la sala"</span>
+                </div>
+                <div class="flex items-center p-2 bg-red-50 rounded">
+                  <span class="font-mono text-red-700">"Asistente, apagar luz de la sala"</span>
+                </div>
+                <div class="flex items-center p-2 bg-green-50 rounded">
+                  <span class="font-mono text-green-700">"Asistente, encender luz de la cocina"</span>
+                </div>
+                <div class="flex items-center p-2 bg-red-50 rounded">
+                  <span class="font-mono text-red-700">"Asistente, apagar luz de la cocina"</span>
+                </div>
+              </div>
+            </div>
 
-    <!-- Reconocimiento de Voz -->
-    <div class="mt-8 text-center">
-      <button id="vozBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded">
-        🎙️ Activar Reconocimiento de Voz
-      </button>
-      <p id="vozTexto" class="mt-4 text-gray-600 text-sm italic"></p>
+            <!-- Intensity Commands -->
+            <div class="bg-white rounded-lg p-4 border border-gray-200">
+              <h3 class="font-semibold text-gray-800 mb-3 flex items-center">
+                <svg class="w-4 h-4 mr-2 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                </svg>
+                Control de Intensidad (Niveles 1-5)
+              </h3>
+              <div class="space-y-3">
+                <div class="border-l-4 border-blue-400 pl-3">
+                  <h4 class="font-medium text-gray-700 mb-2">Cuarto:</h4>
+                  <div class="grid gap-1 text-sm">
+                    <span class="font-mono text-blue-700">"Asistente, intensidad del cuarto nivel 1"</span>
+                    <span class="font-mono text-blue-700">"Asistente, intensidad del cuarto nivel 3"</span>
+                    <span class="font-mono text-blue-700">"Asistente, intensidad del cuarto nivel 5"</span>
+                  </div>
+                </div>
+                <div class="border-l-4 border-purple-400 pl-3">
+                  <h4 class="font-medium text-gray-700 mb-2">Sala:</h4>
+                  <div class="grid gap-1 text-sm">
+                    <span class="font-mono text-purple-700">"Asistente, intensidad de la sala nivel 2"</span>
+                    <span class="font-mono text-purple-700">"Asistente, intensidad de la sala nivel 4"</span>
+                  </div>
+                </div>
+                <div class="border-l-4 border-orange-400 pl-3">
+                  <h4 class="font-medium text-gray-700 mb-2">Cocina:</h4>
+                  <div class="grid gap-1 text-sm">
+                    <span class="font-mono text-orange-700">"Asistente, intensidad de la cocina nivel 1"</span>
+                    <span class="font-mono text-orange-700">"Asistente, intensidad de la cocina nivel 5"</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tips -->
+            <div class="bg-white rounded-lg p-4 border border-gray-200">
+              <h3 class="font-semibold text-gray-800 mb-3 flex items-center">
+                <svg class="w-4 h-4 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                </svg>
+                Consejos de Uso
+              </h3>
+              <ul class="space-y-2 text-sm text-gray-600">
+                <li class="flex items-start">
+                  <span class="w-2 h-2 bg-blue-400 rounded-full mt-2 mr-2 flex-shrink-0"></span>
+                  Habla de forma clara y pausada
+                </li>
+                <li class="flex items-start">
+                  <span class="w-2 h-2 bg-blue-400 rounded-full mt-2 mr-2 flex-shrink-0"></span>
+                  Espera a que aparezca el texto antes del siguiente comando
+                </li>
+                <li class="flex items-start">
+                  <span class="w-2 h-2 bg-blue-400 rounded-full mt-2 mr-2 flex-shrink-0"></span>
+                  Si no funciona, intenta repetir el comando
+                </li>
+                <li class="flex items-start">
+                  <span class="w-2 h-2 bg-blue-400 rounded-full mt-2 mr-2 flex-shrink-0"></span>
+                  Los niveles de intensidad van del 1 (mínimo) al 5 (máximo)
+                </li>
+              </ul>
+            </div>
+          </div>
+        </aside>
+
+        <!-- Overlay for mobile -->
+        <div 
+          id="overlay" 
+          class="fixed inset-0 bg-black bg-opacity-50 z-5 transition-opacity duration-300 opacity-0 pointer-events-none"
+        ></div>
+      </div>
     </div>
 
-    <!-- Mensaje de estado -->
-    <p id="mensaje" class="mt-6 text-center font-semibold"></p>
-  </div>
+    <script>
+      const toggleButton = document.getElementById('toggleGuide');
+      const closeButton = document.getElementById('closeGuide');
+      const guidePanel = document.getElementById('guidePanel');
+      const overlay = document.getElementById('overlay');
+      const chevron = document.getElementById('chevronRight');
+      const buttonText = document.getElementById('guideButtonText');
+      
+      let isGuideOpen = false;
 
-  <script>
-    // Botones manuales
-    const buttons = document.querySelectorAll('button[data-comando]');
-    const mensaje = document.getElementById('mensaje');
+      function openGuide() {
+        isGuideOpen = true;
+        guidePanel.style.display = 'block';
+        
+        // Trigger reflow
+        guidePanel.offsetHeight;
+        
+        guidePanel.classList.remove('translate-x-full', 'opacity-0');
+        guidePanel.classList.add('translate-x-0', 'opacity-100');
+        
+        overlay.classList.remove('opacity-0', 'pointer-events-none');
+        overlay.classList.add('opacity-100');
+        
+        chevron.style.transform = 'rotate(180deg)';
+        buttonText.textContent = 'Ocultar Guía';
+      }
 
-    buttons.forEach(btn => {
-      btn.addEventListener('click', async () => {
-        const comando = btn.getAttribute('data-comando');
-        await enviarComando(comando);
+      function closeGuide() {
+        isGuideOpen = false;
+        guidePanel.classList.remove('translate-x-0', 'opacity-100');
+        guidePanel.classList.add('translate-x-full', 'opacity-0');
+        
+        overlay.classList.remove('opacity-100');
+        overlay.classList.add('opacity-0', 'pointer-events-none');
+        
+        chevron.style.transform = 'rotate(0deg)';
+        buttonText.textContent = 'Mostrar Guía de Comandos';
+        
+        setTimeout(() => {
+          if (!isGuideOpen) {
+            guidePanel.style.display = 'none';
+          }
+        }, 300);
+      }
+
+      toggleButton.addEventListener('click', function() {
+        if (isGuideOpen) {
+          closeGuide();
+        } else {
+          openGuide();
+        }
       });
-    });
 
-    async function enviarComando(comando) {
-      try {
-        const response = await fetch('/accion', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: new URLSearchParams({ comando })
+      closeButton.addEventListener('click', closeGuide);
+      overlay.addEventListener('click', closeGuide);
+
+      // Close guide on escape key
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && isGuideOpen) {
+          closeGuide();
+        }
+      });
+    </script>
+
+    <style>
+      /* Custom slider styles */
+      .slider::-webkit-slider-thumb {
+        appearance: none;
+        height: 20px;
+        width: 20px;
+        border-radius: 50%;
+        background: #3b82f6;
+        cursor: pointer;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      }
+
+      .slider::-moz-range-thumb {
+        height: 20px;
+        width: 20px;
+        border-radius: 50%;
+        background: #3b82f6;
+        cursor: pointer;
+        border: none;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      }
+
+      .slider::-webkit-slider-track {
+        height: 8px;
+        border-radius: 4px;
+        background: #e5e7eb;
+      }
+
+      .slider::-moz-range-track {
+        height: 8px;
+        border-radius: 4px;
+        background: #e5e7eb;
+        border: none;
+      }
+
+      /* Responsive adjustments */
+      @media (max-width: 1024px) {
+        #guidePanel {
+          width: 90vw;
+          right: 5vw;
+          left: 5vw;
+        }
+      }
+    </style>
+
+    <script>
+      // Botones manuales
+      const buttons = document.querySelectorAll("button[data-comando]");
+      const mensaje = document.getElementById("mensaje");
+
+      window.onload = function () {
+        document.getElementById("valor_led1").innerText =
+          document.getElementById("intensidad_led1").value;
+      };
+
+      buttons.forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          const comando = btn.getAttribute("data-comando");
+          await enviarComando(comando);
+        });
+      });
+
+      function enviarIntensidad(comando) {
+        const nivel = document.getElementById(comando).value;
+        const intensidad = nivelAIntensidad(nivel);
+        // Cambia el id del output según el comando
+        let outputId = "";
+        if (comando === "intensidad_cuarto") outputId = "valor_cuarto";
+        else if (comando === "intensidad_sala") outputId = "valor_sala";
+        else if (comando === "intensidad_cocina") outputId = "valor_cocina";
+        if (outputId) document.getElementById(outputId).innerText = nivel;
+        fetch("/accion", {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: `comando=${comando}&intensidad=${intensidad}`,
+        });
+      }
+
+      // ...existing code...
+      async function enviarIntensidadVoz(comando, intensidad) {
+        // Cambia el id del output y slider según el comando
+        let outputId = "";
+        let sliderId = "";
+        let nivel = 1;
+        if (comando === "intensidad_cuarto") {
+          outputId = "valor_cuarto";
+          sliderId = "intensidad_cuarto";
+        } else if (comando === "intensidad_sala") {
+          outputId = "valor_sala";
+          sliderId = "intensidad_sala";
+        } else if (comando === "intensidad_cocina") {
+          outputId = "valor_cocina";
+          sliderId = "intensidad_cocina";
+        }
+        // Calcula el nivel (1-5) a partir del valor PWM recibido
+        if (intensidad == 51) nivel = 1;
+        else if (intensidad == 102) nivel = 2;
+        else if (intensidad == 153) nivel = 3;
+        else if (intensidad == 204) nivel = 4;
+        else if (intensidad == 255) nivel = 5;
+
+        if (outputId) document.getElementById(outputId).innerText = nivel;
+        if (sliderId) document.getElementById(sliderId).value = nivel;
+
+        await fetch("/accion", {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: `comando=${comando}&intensidad=${intensidad}`,
+        });
+        mensaje.textContent = `✅ Intensidad enviada: ${intensidad} (${comando})`;
+        mensaje.className = "mt-6 text-center text-green-600 font-semibold";
+      }
+      // ...existing code...
+
+      function nivelAIntensidad(nivel) {
+        // 1 = 51, 2 = 102, 3 = 153, 4 = 204, 5 = 255
+        const niveles = [0, 51, 102, 153, 204, 255];
+        nivel = Math.max(1, Math.min(5, parseInt(nivel)));
+        return niveles[nivel];
+      }
+
+      async function enviarComando(comando) {
+        try {
+          const response = await fetch("/accion", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: new URLSearchParams({ comando }),
+          });
+
+          if (response.ok) {
+            mensaje.textContent = "✅ Comando enviado: " + comando;
+            mensaje.className = "mt-6 text-center text-green-600 font-semibold";
+          } else {
+            mensaje.textContent = "❌ Error al enviar comando.";
+            mensaje.className = "mt-6 text-center text-red-600 font-semibold";
+          }
+        } catch (error) {
+          mensaje.textContent = "❌ Error de conexión con el servidor.";
+          mensaje.className = "mt-6 text-center text-red-600 font-semibold";
+        }
+      }
+
+      // Reconocimiento de voz
+      const vozBtn = document.getElementById("vozBtn");
+      const vozTexto = document.getElementById("vozTexto");
+      // ...existing code...
+
+      let recognition;
+      let escuchandoComando = false;
+
+      if (
+        "webkitSpeechRecognition" in window ||
+        "SpeechRecognition" in window
+      ) {
+        const SpeechRecognition =
+          window.SpeechRecognition || window.webkitSpeechRecognition;
+        recognition = new SpeechRecognition();
+        recognition.lang = "es-ES";
+        recognition.continuous = true; // Escucha continua
+
+        recognition.onresult = async function (event) {
+          // Toma siempre el último resultado reconocido
+          const texto =
+            event.results[event.results.length - 1][0].transcript.toLowerCase();
+          vozTexto.textContent = 'Escuchado: "' + texto + '"';
+
+          // ...dentro de recognition.onresult...
+          if (!escuchandoComando) {
+            if (texto.includes("asistente")) {
+              escuchandoComando = true;
+              mensaje.textContent = "🔊 Dime tu comando...";
+              mensaje.className =
+                "mt-6 text-center text-blue-600 font-semibold";
+            }
+          } else {
+            // Encender/apagar por nombre
+            // ...dentro de recognition.onresult...
+            if (texto.includes("encender luz del cuarto"))
+              await enviarComando("encender_cuarto");
+            else if (texto.includes("apagar luz del cuarto"))
+              await enviarComando("apagar_cuarto");
+            else if (texto.includes("encender luz de la sala"))
+              await enviarComando("encender_sala");
+            else if (texto.includes("apagar luz de la sala"))
+              await enviarComando("apagar_sala");
+            else if (texto.includes("encender luz de la cocina"))
+              await enviarComando("encender_cocina");
+            else if (texto.includes("apagar luz de la cocina"))
+              await enviarComando("apagar_cocina");
+            // Intensidad por nombre y nivel
+            else if (texto.match(/intensidad.*cuarto.*nivel (\d)/)) {
+              const match = texto.match(/intensidad.*cuarto.*nivel (\d)/);
+              const nivel = match[1];
+              const intensidad = nivelAIntensidad(nivel);
+              await enviarIntensidadVoz("intensidad_cuarto", intensidad);
+            } else if (texto.match(/intensidad.*sala.*nivel (\d)/)) {
+              const match = texto.match(/intensidad.*sala.*nivel (\d)/);
+              const nivel = match[1];
+              const intensidad = nivelAIntensidad(nivel);
+              await enviarIntensidadVoz("intensidad_sala", intensidad);
+            } else if (texto.match(/intensidad.*cocina.*nivel (\d)/)) {
+              const match = texto.match(/intensidad.*cocina.*nivel (\d)/);
+              const nivel = match[1];
+              const intensidad = nivelAIntensidad(nivel);
+              await enviarIntensidadVoz("intensidad_cocina", intensidad);
+            } else {
+              mensaje.textContent = "❌ Comando de voz no reconocido.";
+              mensaje.className = "mt-6 text-center text-red-600 font-semibold";
+            }
+            escuchandoComando = false;
+            mensaje.textContent += " (Di 'asistente' para otro comando)";
+          }
+        };
+
+        recognition.onerror = function (event) {
+          vozTexto.textContent = "Error: " + event.error;
+          recognition.stop();
+          setTimeout(() => recognition.start(), 1000);
+        };
+
+        // Inicia automáticamente
+        recognition.start();
+        vozTexto.textContent = "🎙️ Diga 'asistente' para dar un comando...";
+        // ...después de definir recognition...
+        vozBtn.disabled = false;
+        vozBtn.classList.remove("bg-gray-400", "cursor-not-allowed");
+
+        vozBtn.addEventListener("click", () => {
+          recognition.start();
+          vozTexto.textContent = "🎙️ Escuchando...";
         });
 
-        if (response.ok) {
-          mensaje.textContent = '✅ Comando enviado: ' + comando;
-          mensaje.className = 'mt-6 text-center text-green-600 font-semibold';
-        } else {
-          mensaje.textContent = '❌ Error al enviar comando.';
-          mensaje.className = 'mt-6 text-center text-red-600 font-semibold';
-        }
-      } catch (error) {
-        mensaje.textContent = '❌ Error de conexión con el servidor.';
-        mensaje.className = 'mt-6 text-center text-red-600 font-semibold';
+        // Reinicia automáticamente si se detiene
+        recognition.onend = function () {
+          vozTexto.textContent =
+            "🎤 Micrófono detenido. Pulsa el botón para reactivar.";
+          vozBtn.disabled = false;
+          vozBtn.classList.remove("bg-gray-400", "cursor-not-allowed");
+        };
+        recognition.onerror = function (event) {
+          vozTexto.textContent = "Error: " + event.error;
+          recognition.stop();
+          vozBtn.disabled = false;
+          vozBtn.classList.remove("bg-gray-400", "cursor-not-allowed");
+        };
+      } else {
+        vozTexto.textContent =
+          "⚠️ Tu navegador no soporta reconocimiento de voz.";
+        vozBtn.disabled = true;
+        vozBtn.classList.add("bg-gray-400", "cursor-not-allowed");
       }
-    }
-
-    // Reconocimiento de voz
-    const vozBtn = document.getElementById('vozBtn');
-    const vozTexto = document.getElementById('vozTexto');
-    let recognition;
-
-    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      recognition = new SpeechRecognition();
-      recognition.lang = 'es-ES';
-      recognition.continuous = false;
-
-      recognition.onresult = async function (event) {
-        const texto = event.results[0][0].transcript.toLowerCase();
-        vozTexto.textContent = 'Comando detectado: "' + texto + '"';
-
-        // Mapeo de voz a comandos
-        if (texto.includes('encender luz uno')) await enviarComando('encender_led1');
-        else if (texto.includes('apagar luz uno')) await enviarComando('apagar_led1');
-        else if (texto.includes('encender luz dos')) await enviarComando('encender_led2');
-        else if (texto.includes('apagar luz dos')) await enviarComando('apagar_led2');
-        else if (texto.includes('encender luz tres')) await enviarComando('encender_led3');
-        else if (texto.includes('apagar luz tres')) await enviarComando('apagar_led3');
-        else {
-          mensaje.textContent = '❌ Comando de voz no reconocido.';
-          mensaje.className = 'mt-6 text-center text-red-600 font-semibold';
-        }
-      };
-
-      recognition.onerror = function (event) {
-        vozTexto.textContent = 'Error: ' + event.error;
-      };
-
-      vozBtn.addEventListener('click', () => {
-        recognition.start();
-        vozTexto.textContent = '🎙️ Escuchando...';
-      });
-
-    } else {
-      vozTexto.textContent = '⚠️ Tu navegador no soporta reconocimiento de voz.';
-      vozBtn.disabled = true;
-      vozBtn.classList.add('bg-gray-400', 'cursor-not-allowed');
-    }
-  </script>
-
-</body>
+    </script>
+  </body>
 </html>
