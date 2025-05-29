@@ -1,5 +1,7 @@
 from flask import Flask, render_template, request, jsonify
 import serial
+import re
+
 
 app = Flask(__name__)
 
@@ -17,6 +19,8 @@ comandos_arduino = {
     'apagar_sala': b'3',
     'encender_cocina': b'4',
     'apagar_cocina': b'5',
+    'encender_ventilador': b'6',   # <--- Agrega esto
+    'apagar_ventilador': b'7',     # <--- Y esto
 }
 
 @app.route('/')
@@ -57,6 +61,24 @@ def accion():
         return jsonify({'status': 'OK'})
     else:
         return jsonify({'error': 'Comando no reconocido'}), 400
-
+    
+@app.route('/sensor', methods=['GET'])
+def sensor():
+        if arduino is None:
+            return jsonify({'error': 'Arduino no conectado'}), 500
+        try:
+            # Lee varias líneas hasta encontrar una válida
+            for _ in range(10):
+                linea = arduino.readline().decode(errors='ignore').strip()
+                # Espera una línea como: TEMP:xx.x;HUM:yy.y
+                match = re.match(r'TEMP:([\d.]+);HUM:([\d.]+)', linea)
+                if match:
+                    temp = float(match.group(1))
+                    hum = float(match.group(2))
+                    return jsonify({'temperatura': temp, 'humedad': hum})
+            return jsonify({'error': 'No se recibieron datos válidos'}), 500
+        except Exception as e:
+            return jsonify({'error': f'Error al leer del Arduino: {e}'}), 500
+        
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=False)
