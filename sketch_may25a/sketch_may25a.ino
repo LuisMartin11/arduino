@@ -60,9 +60,9 @@ void loop() {
     else if (comando == "5") { // Apagar LED 3
       estado3 = false;
       analogWrite(led3, 0);
-    }else if (comando == '6') {
+    }else if (comando == "6") {
       digitalWrite(pinVentilador, HIGH); // Encender ventilador
-    } else if (comando == '7') {
+    } else if (comando == "7") {
       digitalWrite(pinVentilador, LOW);  // Apagar ventilador
     }else if (comando.startsWith("I1-")) {
       int valor = comando.substring(3).toInt();

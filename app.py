@@ -7,7 +7,7 @@ app = Flask(__name__)
 
 # Cambia 'COM3' por el puerto correcto de tu Arduino
 try:
-    arduino = serial.Serial('COM3', 9600, timeout=1)
+    arduino = serial.Serial('COM11', 9600, timeout=1)
 except Exception as e:
     print(f'Error al abrir el puerto serial: {e}')
     arduino = None
